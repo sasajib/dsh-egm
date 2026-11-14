@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1-bee.1 (sasajib fork)
+
+- Fix `egm_reviewer` on dsh 0.2.2-rc.3+: `ctx.subagents.list()` no longer exists (use `getProvider('spawn')`), and `startActivation` now takes a flat spec (`prompt`, `parent`, `agentPreset`, `maxDepth` at top level, no `request:` wrapper). Test mocks updated to the same API.
+
+
 ## 0.3.1 — 2026-11-05
 
 - Move the Chinese README to `docs/README.zh-CN.md`, so `README.md` is the only README at the

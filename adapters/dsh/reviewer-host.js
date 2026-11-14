@@ -54,7 +54,7 @@ function reviewerSupportError(ctx) {
   if (ctx.get('agentPresets') === undefined) {
     return 'the agent-presets service is not composed, so the read-only egm-reviewer preset cannot be selected'
   }
-  if (!ctx.subagents.list().includes('spawn')) {
+  if (ctx.subagents.getProvider('spawn') === undefined) {
     return 'no in-process "spawn" subagent provider is composed'
   }
   return undefined
@@ -114,13 +114,11 @@ export function apply(ctx) {
       const activation = await ctx.subagents.startActivation({
         provider: 'spawn',
         label: typeof args.description === 'string' && args.description.trim() !== '' ? args.description : 'EGM Goldfish reviewer',
-        request: {
-          prompt: [{ type: 'text', text: args.prompt }],
-          parent,
-          agentPreset: REVIEWER_PRESET,
-          // Depth 1 admits this child and forbids it from delegating further.
-          maxDepth: 1,
-        },
+        prompt: [{ type: 'text', text: args.prompt }],
+        parent,
+        agentPreset: REVIEWER_PRESET,
+        // Depth 1 admits this child and forbids it from delegating further.
+        maxDepth: 1,
         signal: exec.signal,
         delivery: 'parent',
       })

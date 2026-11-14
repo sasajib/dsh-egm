@@ -44,8 +44,8 @@ function createReviewerContext(options = {}) {
       return undefined
     },
     subagents: {
-      list() {
-        return options.providers ?? ['spawn']
+      getProvider(name) {
+        return (options.providers ?? ['spawn']).includes(name) ? { name } : undefined
       },
       async startActivation(spec) {
         activations.push(spec)
@@ -85,18 +85,18 @@ test('the reviewer plugin registers the egm_reviewer tool and starts preset chil
   const spec = activations[0]
   assert.equal(spec.provider, 'spawn')
   assert.equal(spec.delivery, 'parent')
-  assert.equal(spec.request.agentPreset, 'egm-reviewer', 'the child must mount the read-only preset')
-  assert.equal(spec.request.maxDepth, 1, 'a reviewer must not be able to delegate further')
-  assert.deepEqual(spec.request.prompt, [{ type: 'text', text: 'You are a naive reader.' }])
-  assert.deepEqual(spec.request.parent, { id: 'parent-1' })
+  assert.equal(spec.agentPreset, 'egm-reviewer', 'the child must mount the read-only preset')
+  assert.equal(spec.maxDepth, 1, 'a reviewer must not be able to delegate further')
+  assert.deepEqual(spec.prompt, [{ type: 'text', text: 'You are a naive reader.' }])
+  assert.deepEqual(spec.parent, { id: 'parent-1' })
   const empty = createReviewerContext()
   reviewer.apply(empty.context)
   const prompt = 'Mode: REVIEW\nTargetFile: /fixture/design.md\nGoldfishContext: []'
   await empty.registeredTools[0].execute({description:'empty context',prompt}, {
     agent:{id:'private-parent', history:['PARENT_SENTINEL']}, signal:new AbortController().signal,
   })
-  assert.deepEqual(empty.activations[0].request.prompt, [{type:'text',text:prompt}])
-  assert(!JSON.stringify(empty.activations[0].request.prompt).includes('PARENT_SENTINEL'))
+  assert.deepEqual(empty.activations[0].prompt, [{type:'text',text:prompt}])
+  assert(!JSON.stringify(empty.activations[0].prompt).includes('PARENT_SENTINEL'))
 
 })
 
